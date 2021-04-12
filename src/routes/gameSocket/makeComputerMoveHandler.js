@@ -6,7 +6,8 @@ export const makeComputerMoveHandler = [
     try {
       console.log('Making computer move..');
       const game = data.cmdArgs;
-      const nextGameState = await getNextGameState({ game });
+      const updateProgress = (progress) => comms.data({ progress });
+      const nextGameState = await getNextGameState({ game, updateProgress });
       await comms.connection.do('updateGame', nextGameState);
       comms.send('OK');
     } catch (e) {
