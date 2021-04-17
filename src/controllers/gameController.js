@@ -1,4 +1,4 @@
-import { MoveTaskN, SplitMove, moveInTable } from '../../../chss-engine/src/engine/engine';
+import { MoveTaskN, SplitMove, moveInTable } from 'chss-engine/src/engine/engine';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
 export const getNextGameState = async({ game, updateProgress }) => {

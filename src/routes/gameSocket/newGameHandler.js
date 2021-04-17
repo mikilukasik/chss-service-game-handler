@@ -1,5 +1,4 @@
-// import { GameModel } from 'chss-engine/src/model/Game';
-import { GameModel } from '../../../../chss-engine/src/model/Game';
+import { GameModel } from 'chss-engine/src/model/Game';
 
 export const newGameHandler = [
   'newGame',
