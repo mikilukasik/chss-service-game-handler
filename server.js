@@ -1,12 +1,16 @@
 import { initRoutes } from './src/routes/routes';
-import msgService from '../msg/src/service';
+import msgService from 'msg/src/service';
+
+const SERVICE_NAME = 'chss-service-game-handler';
+const PORT = 4300;
+const MSG_GATEWAY_ADDRESS = '0.0.0.0:3300';
 
 export default () => {
-  const serviceName = 'chss-service-game-handler';
 
   const msg = msgService({
-    PORT: 4300,
-    serviceName,
+    PORT,
+    serviceName: SERVICE_NAME,
+    gatewayAddress: MSG_GATEWAY_ADDRESS,
   });
 
   msg.connect().then(() => {
