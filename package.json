@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index", 
+    "start": "node index",
     "test": "npm test",
     "dev": "nodemon index"
   },
@@ -21,7 +21,6 @@
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
-    "chess-common": "git+https://github.com/mikilukasik/chess-common.git",
     "chss-engine": "git+https://github.com/mikilukasik/chss-engine.git"
   },
   "devDependencies": {
