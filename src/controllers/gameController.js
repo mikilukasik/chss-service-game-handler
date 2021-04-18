@@ -4,7 +4,6 @@ import { resolveSmallMoveTaskOnWorker } from './workersController';
 
 export const getNextGameState = async({ game, updateProgress }) => {
   await gameService.saveGame(game);
-  console.log('here')
   game.moveTask = new MoveTaskN(game);
   game.moveTask.sharedData.desiredDepth = 4;
 
