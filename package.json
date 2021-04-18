@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index",
     "test": "npm test",
-    "dev": "nodemon index"
+    "dev": "nodemon --ignore './games/' index"
   },
   "repository": {
     "type": "git",

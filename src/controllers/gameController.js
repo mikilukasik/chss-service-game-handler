@@ -1,7 +1,10 @@
 import { MoveTaskN, SplitMove, moveInTable } from 'chss-engine/src/engine/engine';
+import { gameService } from '../services/gameService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
 export const getNextGameState = async({ game, updateProgress }) => {
+  await gameService.saveGame(game);
+  console.log('here')
   game.moveTask = new MoveTaskN(game);
   game.moveTask.sharedData.desiredDepth = 4;
 
@@ -27,5 +30,6 @@ export const getNextGameState = async({ game, updateProgress }) => {
   const moveCoords = result[0].moveTree[0];
   const nextGameState = Object.assign({}, moveInTable(moveCoords, game));
 
+  await gameService.saveGame(nextGameState);
   return nextGameState;
 };

@@ -6,7 +6,6 @@ const PORT = 4300;
 const MSG_GATEWAY_ADDRESS = '0.0.0.0:3300';
 
 export default () => {
-
   const msg = msgService({
     PORT,
     serviceName: SERVICE_NAME,
