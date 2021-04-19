@@ -22,6 +22,7 @@
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "chss-engine": "git+https://github.com/mikilukasik/chss-engine.git",
+    "mongodb": "^3.6.6",
     "msg": "git+https://github.com/mikilukasik/msg.git"
   },
   "devDependencies": {

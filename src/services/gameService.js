@@ -1,9 +1,13 @@
-import fs from 'fs';
-import path from 'path';
+import { GameModel } from 'chss-engine/src/model/Game';
+import { getCollection } from './mongoService';
 
-export const gameService = (() => {
-  return {
-    saveGame: (game) => new Promise((resolve, reject) => 
-      fs.writeFile(path.resolve(`./games/${game.id}.json`), JSON.stringify(game), 'utf8', (err, res) => err ? reject(err) : resolve(res))),
-  };
-})();
+export const createGame = async() => {
+  const game = new GameModel();
+  game._id = game.id;
+  (await getCollection('games')).insertOne(game);
+  return game;
+};
+
+export const updateGame = async(game) => {
+  return (await getCollection('games')).replaceOne({_id: game.id}, game);
+};
