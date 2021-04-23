@@ -1,5 +1,5 @@
 import { initRoutes } from './src/routes/routes';
-import msgService from 'msg/src/service';
+import msgService from './msg/src/service';
 
 const SERVICE_NAME = 'chss-service-game-handler';
 const PORT = 4300;
