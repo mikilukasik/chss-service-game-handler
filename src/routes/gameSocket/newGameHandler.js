@@ -1,12 +1,10 @@
-import { GameModel } from 'chss-engine/src/model/Game';
+import { createGame } from '../../services/gameService';
 
 export const newGameHandler = [
   'newGame',
-  (data, comms) => {
-    console.log('Starting new game..');
-
-    const game = new GameModel();
-    comms.connection.do('updateGame', game).then(() => {
+  async(data, comms) => {
+    const game = await createGame();
+    await comms.connection.do('updateGame', game).then(() => {
       comms.send('OK');
     }).catch(comms.error);
   },

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index",
     "test": "npm test",
-    "dev": "nodemon index"
+    "dev": "nodemon --ignore './games/' index"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,8 @@
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
-    "chss-engine": "git+https://github.com/mikilukasik/chss-engine.git"
+    "chss-engine": "git+https://github.com/mikilukasik/chss-engine.git",
+    "mongodb": "^3.6.6"
   },
   "devDependencies": {
     "@babel/register": "^7.13.14"
