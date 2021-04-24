@@ -15,7 +15,11 @@ const init = ({ workersSocket }) => {
 
 const getNextAvailableConnection = async() => {
   const { connections } = await getWorkersSocket();
-  const availableConnection = connections.find(({ key }) => !busyConnections[key]);
+  const availableConnection = connections
+    .filter(({ key }) => !busyConnections[key])
+    .sort((a, b) => a.cookies.get('CHSS_CLIENT_SPEED') - b.cookies.get('CHSS_CLIENT_SPEED'))
+    [0];
+
   if (!availableConnection) return new Promise(resolve => nextAvailableConnectionResolvers.push(resolve));
   
   busyConnections[availableConnection.key] = true;
