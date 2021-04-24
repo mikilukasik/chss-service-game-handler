@@ -1,4 +1,4 @@
-import { GameModel } from 'chss-engine/src/model/Game';
+import { GameModel } from '../../chss-engine/src/model/Game';
 import { getCollection } from './mongoService';
 
 export const createGame = async() => {
