@@ -28,12 +28,11 @@ const getNextAvailableConnection = async() => {
 
 export const resolveSmallMoveTaskOnWorker = async({ smallMoveTask }) => {
   const connection = await getNextAvailableConnection();
-
   const response = await connection.do('solveSmallMoveTask', smallMoveTask);
 
   const pendingConnectionResolver = nextAvailableConnectionResolvers.pop()
   if (pendingConnectionResolver) {
-    pendingConnectionResolver(connection)
+    pendingConnectionResolver(connection);
     return response;
   }
    
