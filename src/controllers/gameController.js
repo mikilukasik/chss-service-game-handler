@@ -1,4 +1,4 @@
-import { MoveTaskN, SplitMove, moveInTable } from '../../chss-engine/src/engine/engine';
+import { MoveTaskN, SplitMove, moveInTable } from '../../chss-engine/src/engine/engine_old';
 import { updateGame } from '../services/gameService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
