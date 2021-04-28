@@ -30,5 +30,5 @@ export const getNextGameState = async({ game, updateProgress }) => {
   const nextGameState = Object.assign({}, moveInTable(moveCoords, game));
 
   await updateGame(nextGameState);
-  return nextGameState;
+  return { nextGameState, stats: result };
 };

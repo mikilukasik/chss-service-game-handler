@@ -23,14 +23,14 @@ const getNextAvailableConnection = async() => {
   if (!availableConnection) return new Promise(resolve => nextAvailableConnectionResolvers.push(resolve));
   
   busyConnections[availableConnection.key] = true;
-  return availableConnection
+  return availableConnection;
 };
 
 export const resolveSmallMoveTaskOnWorker = async({ smallMoveTask }) => {
   const connection = await getNextAvailableConnection();
   const response = await connection.do('solveSmallMoveTask', smallMoveTask);
 
-  const pendingConnectionResolver = nextAvailableConnectionResolvers.pop()
+  const pendingConnectionResolver = nextAvailableConnectionResolvers.pop();
   if (pendingConnectionResolver) {
     pendingConnectionResolver(connection);
     return response;
