@@ -11,7 +11,7 @@ export const makeComputerMoveHandler = [
       await comms.connection.do('updateGame', nextGameState);
       comms.send('OK');
     } catch (e) {
-      comms.error(e.message);
+      comms.error(`${e.message}\n${e.stack}`);
     }
   },
 ];

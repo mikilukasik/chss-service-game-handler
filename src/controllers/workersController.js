@@ -14,7 +14,8 @@ const init = ({ workersSocket }) => {
 };
 
 const getNextAvailableConnection = async() => {
-  const { connections } = await getWorkersSocket();
+  const { connections, onEvt } = await getWorkersSocket();
+  // onEvt('open', (...args) => {console.log({args})})
   const availableConnection = connections
     .filter(({ key }) => !busyConnections[key])
     .sort((a, b) => a.cookies.get('CHSS_CLIENT_SPEED') - b.cookies.get('CHSS_CLIENT_SPEED'))
