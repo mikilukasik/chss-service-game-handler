@@ -1,9 +1,19 @@
 import { MoveTaskN, SplitMove, moveInTable } from '../../chss-module-engine/src/engine/engine';
 import { updateGame } from '../services/gameService';
+import { findMoveInBooks } from '../services/openingsService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
 export const getNextGameState = async({ game, updateProgress }) => {
   await updateGame(game);
+
+  const moveFromBooks = await findMoveInBooks(game);
+  if (moveFromBooks) {
+    const nextGameState = Object.assign({}, moveInTable(moveFromBooks, game));
+
+    await updateGame(nextGameState);
+    return { nextGameState, stats: null };
+  }
+
   game.moveTask = new MoveTaskN(game);
   game.moveTask.sharedData.desiredDepth = 4;
 

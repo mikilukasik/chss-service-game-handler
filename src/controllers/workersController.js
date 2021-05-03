@@ -3,12 +3,26 @@ const workersSocketResolvers = [];
 const nextAvailableConnectionResolvers = [];
 const busyConnections = {};
 
+const onSocketOpen = (connection) => {
+  busyConnections[connection.key] = true;
+  connection.do('init').then(() => {
+    const pendingConnectionResolver = nextAvailableConnectionResolvers.pop();
+    if (pendingConnectionResolver) {
+      pendingConnectionResolver(connection);
+      return;
+    }
+
+    delete busyConnections[connection.key];
+  });
+};
+
 const getWorkersSocket = () => new Promise(resolve => {
   if (_workersSocket) return resolve(_workersSocket);
   workersSocketResolvers.push(resolve);  
 });
 
 const init = ({ workersSocket }) => {
+  workersSocket.onEvt('open', onSocketOpen);
   _workersSocket = workersSocket;
   workersSocketResolvers.forEach(resolve => resolve(workersSocket));
 };
