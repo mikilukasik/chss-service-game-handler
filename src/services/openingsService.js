@@ -21,7 +21,7 @@ book.on('loaded', () => {
   finderAwaiters.forEach(resolve => resolve(_finder));
 });
 
-export const findMoveInBooks = async(game) => {
+export const getMoveFromBooks = async(game) => {
   const finder = await getFinder();
   const fen = toFen(game);
   const entries = finder(fen);
