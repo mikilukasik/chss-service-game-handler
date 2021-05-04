@@ -1,11 +1,11 @@
 import { workersController } from '../controllers/workersController';
-import { makeComputerMoveHandler } from './gameSocket/makeComputerMoveHandler';
-import { newGameHandler } from './gameSocket/newGameHandler';
+import { makeComputerMoveHandler } from './playerSocket/makeComputerMoveHandler';
+import { newGameHandler } from './playerSocket/newGameHandler';
 
 export const initRoutes = ({ msg }) => {
-  const gameSocket = msg.ws('/gameSocket');
-  gameSocket.on(...newGameHandler);
-  gameSocket.on(...makeComputerMoveHandler);
+  const playerSocket = msg.ws('/playerSocket');
+  playerSocket.on(...newGameHandler);
+  playerSocket.on(...makeComputerMoveHandler);
 
   const workersSocket = msg.ws('/workersSocket');
   workersController.init({ workersSocket });
