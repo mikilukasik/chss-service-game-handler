@@ -1,11 +1,24 @@
 import { workersController } from '../controllers/workersController';
-import { makeComputerMoveHandler } from './playerSocket/makeComputerMoveHandler';
+import { updateGameHandler } from './playerSocket/updateGameHandler';
+import { getActiveGamesHandler } from './playerSocket/getActiveGamesHandler';
 import { newGameHandler } from './playerSocket/newGameHandler';
 
+let playerSocket;
+const playerSocketAwaiters = [];
+
+export const getPlayerSocket = () => new Promise(resolve => {
+  if (playerSocket) return resolve(playerSocket);
+  playerSocketAwaiters.push(resolve);
+});
+
 export const initRoutes = ({ msg }) => {
-  const playerSocket = msg.ws('/playerSocket');
+  playerSocket = msg.ws('/playerSocket');
+
   playerSocket.on(...newGameHandler);
-  playerSocket.on(...makeComputerMoveHandler);
+  playerSocket.on(...updateGameHandler);
+  playerSocket.on(...getActiveGamesHandler);
+
+  playerSocketAwaiters.forEach(resolve => resolve(playerSocket))
 
   const workersSocket = msg.ws('/workersSocket');
   workersController.init({ workersSocket });
