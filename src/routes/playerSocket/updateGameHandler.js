@@ -1,5 +1,5 @@
 import { getNextGameState } from "../../controllers/gameController";
-import { getGame } from "../../services/gameService";
+import { getGame, updateGame } from "../../services/gameService";
 import { getLoggedInUsersForClient } from "../../services/userService";
 
 export const updateGameHandler = [
@@ -20,9 +20,14 @@ export const updateGameHandler = [
         return;
       }
 
-      const updateProgress = (progress) => comms.data({ progress });
-      const { stats } = await getNextGameState({ game, updateProgress });
-      if (stats) comms.connection.do('displayStats', stats);
+      await updateGame(game);
+
+      if (true /* // TODO: if computerIsOpponent */) {
+        const updateProgress = (progress) => comms.data({ progress });
+        const { stats } = await getNextGameState({ game, updateProgress });
+        if (stats) comms.connection.do('displayStats', stats);
+      }
+      
       comms.send('OK');
     } catch (e) {
       console.error(e);

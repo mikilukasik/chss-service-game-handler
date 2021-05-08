@@ -25,8 +25,11 @@ export const getGame = async(filters) => {
 
 export const updateGame = async(game) => {
   game.updatedAt = new Date().toISOString();
+  
   const playerSocket = await getPlayerSocket();
   playerSocket.emit(`gameChanged:${game.id}`, game);
+  if (game.completed) playerSocket.emit(`gameCompleted:${game.id}`, game);
+
   const gamesCollection = await getCollection('games');
   return gamesCollection.replaceOne({_id: game.id}, game, { upsert: true });
 };

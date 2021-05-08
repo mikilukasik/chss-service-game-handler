@@ -4,8 +4,6 @@ import { getMoveFromBooks } from '../services/openingsService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
 export const getNextGameState = async({ game, updateProgress }) => {
-  await updateGame(game);
-
   const moveFromBooks = await getMoveFromBooks(game);
   if (moveFromBooks) {
     const nextGameState = Object.assign({}, moveInTable(moveFromBooks, game));
