@@ -1,6 +1,6 @@
 import { workersController } from '../controllers/workersController';
 import { updateGameHandler } from './playerSocket/updateGameHandler';
-import { getActiveGamesHandler } from './playerSocket/getActiveGamesHandler';
+import { getGamesHandler } from './playerSocket/getGamesHandler';
 import { newGameHandler } from './playerSocket/newGameHandler';
 
 let playerSocket;
@@ -16,7 +16,7 @@ export const initRoutes = ({ msg }) => {
 
   playerSocket.on(...newGameHandler);
   playerSocket.on(...updateGameHandler);
-  playerSocket.on(...getActiveGamesHandler);
+  playerSocket.on(...getGamesHandler);
 
   playerSocketAwaiters.forEach(resolve => resolve(playerSocket))
 

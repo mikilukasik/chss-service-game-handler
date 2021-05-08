@@ -34,7 +34,7 @@ export const updateGame = async(game) => {
   return gamesCollection.replaceOne({_id: game.id}, game, { upsert: true });
 };
 
-export const getActiveGames = async() => {
+export const getGames = async() => {
   const gamesCollection = await getCollection('games');
   return gamesCollection.find({ status: 'active' }).sort({ createdAt: -1 }).toArray(); 
 };
