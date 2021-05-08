@@ -2,6 +2,9 @@ import { GameModel } from '../../chss-module-engine/src/model/Game';
 import { getPlayerSocket } from '../routes/routes';
 import { getCollection } from './mongoService';
 
+const PAUSE_ABANDONED_GAMES_INTERVAL = 20000;
+const PAUSE_AFTER_INACTIVE_FOR = 300000;
+
 export const createGame = async(options) => {
   const game = new GameModel(options);
 
@@ -11,19 +14,45 @@ export const createGame = async(options) => {
   (await getCollection('games')).insertOne(game);
   const playerSocket = await getPlayerSocket();
   
-  playerSocket.emit('msg:gameCreated', game);
+  playerSocket.emit('gameCreated', game);
   return game;
+};
+
+export const getGame = async(filters) => {
+  const gamesCollection = await getCollection('games');
+  return gamesCollection.findOne(filters);
 };
 
 export const updateGame = async(game) => {
   game.updatedAt = new Date().toISOString();
   const playerSocket = await getPlayerSocket();
-  playerSocket.emit(`msg:gameChanged:${game.id}`, game);
+  playerSocket.emit(`gameChanged:${game.id}`, game);
   const gamesCollection = await getCollection('games');
   return gamesCollection.replaceOne({_id: game.id}, game, { upsert: true });
 };
 
 export const getActiveGames = async() => {
   const gamesCollection = await getCollection('games');
-  return gamesCollection.find({ completed: false, updatedAt: { $gt: new Date(Date.now() - 300000).toISOString() } }).sort({ createdAt: -1 }).toArray(); // games updated in the last 5 minutes
+  return gamesCollection.find({ status: 'active' }).sort({ createdAt: -1 }).toArray(); 
 };
+
+const pauseAbandonedGames = async() => {
+  const query = { status: 'active', updatedAt: { $lt: new Date(Date.now() - PAUSE_AFTER_INACTIVE_FOR).toISOString() } };
+  const update = { $set: { status: 'paused'} };
+
+  const gamesCollection = await getCollection('games');
+  // can't use updateMany as we need the list of actually updated IDs to emit them.
+  // Also need to make sure that we only pause games that didn't update between the 2 queries
+  gamesCollection.find(query).forEach(({ id }) => {
+    gamesCollection.findOneAndUpdate(Object.assign({ id }, query), update, { returnOriginal: false })
+      .then(async({ value: game, lastErrorObject: { updatedExisting }}) => {
+        if (updatedExisting) {
+          const playerSocket = await getPlayerSocket();
+          playerSocket.emit('activeGamePaused', game)
+        }
+      });
+  });
+};
+
+pauseAbandonedGames();
+setInterval(pauseAbandonedGames, PAUSE_ABANDONED_GAMES_INTERVAL);
