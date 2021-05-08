@@ -39,7 +39,7 @@ const init = ({ workersSocket }) => {
 };
 
 const getNextAvailableConnection = async() => {
-  const { connections, onEvt } = await getWorkersSocket();
+  const { connections } = await getWorkersSocket();
   const availableConnection = connections
     .filter(c => !getConnMeta(c).busy)
     .sort((a, b) => {
@@ -50,7 +50,13 @@ const getNextAvailableConnection = async() => {
     })
     .pop();
 
-  if (!availableConnection) return new Promise(resolve => nextAvailableConnectionResolvers.push(resolve));
+  if (!availableConnection) return new Promise(resolve => {
+    // will put it in the awaiters array, likely to the beginning, but maybe elsewhere for balancing tasks under load 
+    if (Math.random() < 0.7) return nextAvailableConnectionResolvers.unshift(resolve);
+
+    const positionToInsertTo = Math.floor(Math.random() * nextAvailableConnectionResolvers.length);
+    nextAvailableConnectionResolvers.splice(positionToInsertTo, 0, resolve);
+  });
   
   assignConnectionMeta(availableConnection, { busy: true });
   return availableConnection;
