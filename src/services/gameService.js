@@ -3,7 +3,7 @@ import { getPlayerSocket } from '../routes/routes';
 import { getCollection } from './mongoService';
 
 const PAUSE_ABANDONED_GAMES_INTERVAL = 20000;
-const PAUSE_AFTER_INACTIVE_FOR = 300000;
+const PAUSE_AFTER_INACTIVE_FOR = 600000;
 
 export const createGame = async(options) => {
   const game = new GameModel(options);
@@ -24,9 +24,14 @@ export const getGame = async(filters) => {
 };
 
 export const updateGame = async(game) => {
-  game.updatedAt = new Date().toISOString();
-  
   const playerSocket = await getPlayerSocket();
+
+  game.updatedAt = new Date().toISOString();
+  if (game.status !== 'active') {
+    game.status = 'active';
+    playerSocket.emit('gameBecameActive', game);
+  }
+  
   playerSocket.emit(`gameChanged:${game.id}`, game);
   if (game.completed) playerSocket.emit(`gameCompleted:${game.id}`, game);
 
