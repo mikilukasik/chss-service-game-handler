@@ -3,6 +3,7 @@ import { updateGameHandler } from './playerSocket/updateGameHandler';
 import { getGamesHandler } from './playerSocket/getGamesHandler';
 import { newGameHandler } from './playerSocket/newGameHandler';
 import { getScoreBoardHandler } from './playerSocket/getScoreBoardHandler';
+import { getGameHandler } from './playerSocket/getGameHandler';
 
 let playerSocket;
 const playerSocketAwaiters = [];
@@ -18,6 +19,7 @@ export const initRoutes = ({ msg }) => {
   playerSocket.on(...newGameHandler);
   playerSocket.on(...updateGameHandler);
   playerSocket.on(...getGamesHandler);
+  playerSocket.on(...getGameHandler);
   playerSocket.on(...getScoreBoardHandler);
 
   playerSocketAwaiters.forEach(resolve => resolve(playerSocket))
