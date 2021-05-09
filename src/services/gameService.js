@@ -1,6 +1,7 @@
 import { GameModel } from '../../chss-module-engine/src/model/Game';
 import { getPlayerSocket } from '../routes/routes';
 import { getCollection } from './mongoService';
+import { getScoreBoard, processGameScore } from './scoreBoardService';
 
 const PAUSE_ABANDONED_GAMES_INTERVAL = 20000;
 const PAUSE_AFTER_INACTIVE_FOR = 600000;
@@ -32,11 +33,17 @@ export const updateGame = async(game) => {
     playerSocket.emit('gameBecameActive', game);
   }
   
-  playerSocket.emit(`gameChanged:${game.id}`, game);
-  if (game.completed) playerSocket.emit(`gameCompleted:${game.id}`, game);
-
   const gamesCollection = await getCollection('games');
-  return gamesCollection.replaceOne({_id: game.id}, game, { upsert: true });
+  const result = await gamesCollection.replaceOne({_id: game.id}, game, { upsert: true });
+
+  playerSocket.emit(`gameChanged:${game.id}`, game);
+  if (game.completed) {
+    playerSocket.emit(`gameCompleted:${game.id}`, game);
+    const { scoreBoardModified } = await processGameScore(game);
+    if (scoreBoardModified) playerSocket.emit('scoreBoardChanged', await getScoreBoard());
+  }
+
+  return result;
 };
 
 export const getGames = async() => {
