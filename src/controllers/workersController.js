@@ -1,4 +1,4 @@
-const WORKER_TIMEOUT = 3000;
+const WORKER_TIMEOUT = 6000;
 
 let _workersSocket;
 const workersSocketResolvers = [];
