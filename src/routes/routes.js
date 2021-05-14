@@ -2,6 +2,7 @@ import { workersController } from '../controllers/workersController';
 import { updateGameHandler } from './playerSocket/updateGameHandler';
 import { getGamesHandler } from './playerSocket/getGamesHandler';
 import { newGameHandler } from './playerSocket/newGameHandler';
+import { newCustomGameHandler } from './playerSocket/newCustomGameHandler';
 import { getScoreBoardHandler } from './playerSocket/getScoreBoardHandler';
 import { getGameHandler } from './playerSocket/getGameHandler';
 
@@ -17,6 +18,7 @@ export const initRoutes = ({ msg }) => {
   playerSocket = msg.ws('/playerSocket');
 
   playerSocket.on(...newGameHandler);
+  playerSocket.on(...newCustomGameHandler);
   playerSocket.on(...updateGameHandler);
   playerSocket.on(...getGamesHandler);
   playerSocket.on(...getGameHandler);

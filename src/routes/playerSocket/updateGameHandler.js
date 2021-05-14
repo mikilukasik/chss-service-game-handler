@@ -24,7 +24,11 @@ export const updateGameHandler = [
 
       if (true /* // TODO: if computerIsOpponent */) {
         const updateProgress = (progress) => comms.data({ progress });
-        const { stats } = await getNextGameState({ game, updateProgress });
+        const nextGameState = await getNextGameState({ game, updateProgress });
+
+        if (!nextGameState) return comms.send(null);
+
+        const { stats } = nextGameState;
         if (stats) comms.connection.do('displayStats', stats);
       }
       

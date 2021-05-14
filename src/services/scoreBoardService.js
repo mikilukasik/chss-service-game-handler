@@ -25,7 +25,7 @@ const sortAndLimitScoreBoard = () => {
 };
 
 export const processGameScore = async(game) => {
-  if (!game.completed || !([game.wName, game.bName].includes('Computer'))) return { scoreBoardModified: false };
+  if (game.isCustom || !game.completed || !([game.wName, game.bName].includes('Computer'))) return { scoreBoardModified: false };
 
   const won = 
     (game.whiteWon && game.computerPlaysBlack) ||
