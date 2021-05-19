@@ -12,8 +12,6 @@ export const updateGameHandler = [
       const user = usersLoggedInOnClient.find(u => u.userId === userId);
       if (!user) return comms.error('User is not allowed to update this game');
 
-      const userIdsLoggedInOnClient = usersLoggedInOnClient.map(user => user.userId);
-
       const previousGameState = await getGame({ id: game.id });
       const userIdThatCanUpdateGame = !previousGameState.completed && previousGameState.wNext
         ? previousGameState.wPlayer

@@ -25,8 +25,17 @@ export const getNextGameState = async({ game, updateProgress }) => {
     completed: 0
   };
 
+  const setCurrentBests = (latestValue) => {
+    tempMoves[0].currentBests[1] = tempMoves[0].currentBests[1]
+      ? Math.max(tempMoves[0].currentBests[1], latestValue)
+      : latestValue;
+  }
+
   const result = await Promise.all(tempMoves.map(smallMoveTask => 
     resolveSmallMoveTaskOnWorker({ smallMoveTask }).then(response => {
+
+      setCurrentBests(response.score);
+
       progress.completed += 1;
       updateProgress(progress);
       return response;
