@@ -4,7 +4,7 @@ import { getCollection } from './mongoService';
 import { getScoreBoard, processGameScore } from './scoreBoardService';
 
 const PAUSE_ABANDONED_GAMES_INTERVAL = 20000;
-const PAUSE_AFTER_INACTIVE_FOR = 600000;
+const PAUSE_AFTER_INACTIVE_FOR = 60 * 60 * 1000;
 
 export const createGame = async(options) => {
   const game = new GameModel(options);

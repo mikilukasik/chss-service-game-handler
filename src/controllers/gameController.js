@@ -31,16 +31,15 @@ export const getNextGameState = async({ game, updateProgress }) => {
       : latestValue;
   }
 
-  const result = await Promise.all(tempMoves.map(smallMoveTask => 
+  const result = (await Promise.all(tempMoves.map(smallMoveTask => 
     resolveSmallMoveTaskOnWorker({ smallMoveTask }).then(response => {
-
-      setCurrentBests(response.score);
+      if (response) setCurrentBests(response.score);
 
       progress.completed += 1;
       updateProgress(progress);
       return response;
-    })
-  ));
+    }).catch(console.error)
+  ))).filter(Boolean);
 
   if (!result.length) return null;
 
