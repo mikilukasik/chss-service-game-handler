@@ -5,6 +5,7 @@ import { newGameHandler } from './playerSocket/newGameHandler';
 import { newCustomGameHandler } from './playerSocket/newCustomGameHandler';
 import { getScoreBoardHandler } from './playerSocket/getScoreBoardHandler';
 import { getGameHandler } from './playerSocket/getGameHandler';
+import { perftHandler } from './playerSocket/perftHandler';
 
 let playerSocket;
 const playerSocketAwaiters = [];
@@ -20,6 +21,7 @@ export const initRoutes = ({ msg }) => {
   playerSocket.on(...newGameHandler);
   playerSocket.on(...newCustomGameHandler);
   playerSocket.on(...updateGameHandler);
+  playerSocket.on(...perftHandler);
   playerSocket.on(...getGamesHandler);
   playerSocket.on(...getGameHandler);
   playerSocket.on(...getScoreBoardHandler);

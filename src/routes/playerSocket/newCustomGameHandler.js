@@ -3,11 +3,12 @@ import { createGame } from '../../services/gameService';
 
 export const newCustomGameHandler = [
   'newCustomGame',
-  async({ tableString, wNext, user }, comms) => {
+  async({ fen, user }, comms) => {
     const options = {
-      table: aptStringToTable(tableString),
-      wNext,
+      fen,
     };
+
+    const wNext = fen.split(' ')[1] === 'w';
 
     // TODO: we assume that game will be played against computer
     options[wNext ? 'wPlayer' : 'bPlayer'] = user.userId;

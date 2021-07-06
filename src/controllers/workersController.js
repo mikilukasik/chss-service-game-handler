@@ -1,4 +1,4 @@
-const WORKER_TIMEOUT = 6000;
+const WORKER_TIMEOUT = 10000;
 
 let _workersSocket;
 const workersSocketResolvers = [];
@@ -62,10 +62,11 @@ const getNextAvailableConnection = async() => {
   return availableConnection;
 };
 
-const solver = async(smallMoveTask) => {
+const solver = async(moveTask) => {
   const connection = await getNextAvailableConnection();
-  let timedOut = false;
+  if (Date.now() > moveTask.endAt) throw false;
 
+  let timedOut = false;
   const response = await new Promise(async(resolve) => {
     const timeout = setTimeout(async() => {
       // worker timed out
@@ -73,10 +74,10 @@ const solver = async(smallMoveTask) => {
       assignConnectionMeta(connection, { timeoutCount: (getConnMeta(connection).timeoutCount || 0) + 1 });
       console.log('A worker timed out', getConnMeta(connection));
 
-      return resolve(await solver(smallMoveTask));
+      return resolve(await solver(moveTask));
     }, WORKER_TIMEOUT);
 
-    connection.do('solveSmallMoveTask', smallMoveTask)
+    connection.do('solveSmallMoveTask', moveTask)
       .then(result => {
         clearTimeout(timeout);
         if (!timedOut) return resolve(result);
@@ -98,8 +99,10 @@ const solver = async(smallMoveTask) => {
   return response;
 };
 
-export const resolveSmallMoveTaskOnWorker = async({ smallMoveTask }) => {
-  return await solver(smallMoveTask);
+export const resolveSmallMoveTaskOnWorker = async(moveTask) => {
+  if (Date.now() > moveTask.endAt) throw false;
+
+  return await solver(moveTask);
 };
 
 export const workersController = {
