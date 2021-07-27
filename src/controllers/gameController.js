@@ -3,7 +3,7 @@ import { updateGame } from '../services/gameService';
 import { getMoveFromBooks } from '../services/openingsService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
-const CUTOFF_TIME = 1400;
+const CUTOFF_TIME = 1000;
 
 // TODO: this ABORT_TIME is not fully implemented.. hence 75s
 const ABORT_TIME = 75000;
@@ -69,7 +69,7 @@ export const getNextGameState = async({ game, updateProgress }) => {
   
 
   const getResultForDepth = async(depth, d1Moves, d2Moves, popularMoves, moveTrees, endAt) => {
-    const currentBest = [-128];
+    const currentBest = [-32768];
     const progress = {
       total: d1Moves.length,
       completed: 0
@@ -77,7 +77,7 @@ export const getNextGameState = async({ game, updateProgress }) => {
 
     const result = (await Promise.all(d1Moves.map(move => 
       resolveSmallMoveTaskOnWorker({ move, nextMoves: d2Moves[move], currentBest, board: game.board, desiredDepth: depth, popularMoves, moveTree: moveTrees[move], endAt, dontLoop: game.dontLoop, repeatedPastFens: game.repeatedPastFens }).then(response => {
-        if (currentBest[0] === -128 ||
+        if (currentBest[0] === -32768 ||
           (true && response.score < currentBest[0])
         ) {
           currentBest[0] = response.score
@@ -86,7 +86,7 @@ export const getNextGameState = async({ game, updateProgress }) => {
         d2Moves[move] = response.nextMoves;
         moveTrees[move] = response.moveTree;
         progress.completed += 1;
-        updateProgress(progress);
+        if (depth >= 4) updateProgress(progress);
 
         if (Date.now() > endAt) throw false;
 
