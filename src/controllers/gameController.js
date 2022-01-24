@@ -3,7 +3,7 @@ import { updateGame } from '../services/gameService';
 import { getMoveFromBooks } from '../services/openingsService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
-const CUTOFF_TIME = 1000;
+const CUTOFF_TIME = 2000;
 
 // TODO: this ABORT_TIME is not fully implemented.. hence 75s
 const ABORT_TIME = 75000;

@@ -6,14 +6,16 @@ import { newCustomGameHandler } from './playerSocket/newCustomGameHandler';
 import { getScoreBoardHandler } from './playerSocket/getScoreBoardHandler';
 import { getGameHandler } from './playerSocket/getGameHandler';
 import { perftHandler } from './playerSocket/perftHandler';
+import { tournamentController } from '../controllers/tournamentController';
 
 let playerSocket;
 const playerSocketAwaiters = [];
 
-export const getPlayerSocket = () => new Promise(resolve => {
-  if (playerSocket) return resolve(playerSocket);
-  playerSocketAwaiters.push(resolve);
-});
+export const getPlayerSocket = () =>
+  new Promise((resolve) => {
+    if (playerSocket) return resolve(playerSocket);
+    playerSocketAwaiters.push(resolve);
+  });
 
 export const initRoutes = ({ msg }) => {
   playerSocket = msg.ws('/playerSocket');
@@ -26,8 +28,13 @@ export const initRoutes = ({ msg }) => {
   playerSocket.on(...getGameHandler);
   playerSocket.on(...getScoreBoardHandler);
 
-  playerSocketAwaiters.forEach(resolve => resolve(playerSocket))
+  playerSocketAwaiters.forEach((resolve) => resolve(playerSocket));
 
   const workersSocket = msg.ws('/workersSocket');
   workersController.init({ workersSocket });
+
+  const tournamentSocket = msg.ws('/tournamentSocket');
+  tournamentController.init({ tournamentSocket });
+
+  msg.static('/models/', 'public/models'); //.then(console.log, console.error);
 };

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index",
     "test": "npm test",
-    "dev": "nodemon --ignore './games/' index"
+    "dev": "nodemon index"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,8 @@
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
-    "mongodb": "^3.6.6"
+    "mongodb": "^3.6.6",
+    "uuid-random": "^1.3.2"
   },
   "devDependencies": {
     "@babel/register": "^7.13.14"
