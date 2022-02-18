@@ -12,8 +12,10 @@ export default () => {
     gatewayAddress: MSG_GATEWAY_ADDRESS,
   });
 
-  msg.connect().then(() => {
-    console.log('MSG connected: ' + SERVICE_NAME);
-    initRoutes({ msg });
-  }).catch(console.error);
+  msg
+    .connect()
+    .then(() => {
+      initRoutes({ msg });
+    })
+    .catch(console.error);
 };

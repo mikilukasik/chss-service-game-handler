@@ -1,9 +1,7 @@
-import { getModelNames } from '../../services/tournamentService';
-
-export const getModelsHandler = [
+export const getModelsHandler = ({ msg }) => [
   'getModelNames',
   async (arg, comms) => {
-    const models = await getModelNames();
+    const models = await msg.do('getAllModelNames');
     comms.send(models);
   },
 ];

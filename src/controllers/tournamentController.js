@@ -4,7 +4,7 @@ import { startTournamentHandler } from '../routes/tournamentSocket/startTourname
 import { tournamentGameFinishedHandler } from '../routes/tournamentSocket/tournamentGameFinishedHandler';
 import { updateGame } from '../services/gameService';
 import { getMoveFromBooks } from '../services/openingsService';
-import { getModelNames } from '../services/tournamentService';
+// import { getModelNames } from '../services/tournamentService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 import uuid from 'uuid-random';
 import path from 'path';
@@ -16,8 +16,11 @@ const cacheFolder = './tournamentGameCache';
 
 const tournaments = {};
 
-const init = ({ tournamentSocket }) => {
-  tournamentSocket.on(...getModelsHandler);
+let _msg;
+
+const init = ({ tournamentSocket, msg }) => {
+  _msg = msg;
+  tournamentSocket.on(...getModelsHandler({ msg }));
   tournamentSocket.on(...startTournamentHandler);
   tournamentSocket.on(...startLearningHandler);
   tournamentSocket.on(...tournamentGameFinishedHandler);
@@ -100,7 +103,7 @@ const getCachedGame = async ({ wPlayer, bPlayer }) => {
 export const createTournament = async ({ aiPlayers, randomValue, rounds, connection }) => {
   await fs.mkdir(path.resolve(cacheFolder), { recursive: true });
 
-  let modelNames = await getModelNames();
+  let modelNames = await _msg.do('getAllModelNames');
   let aiPlayerNames = modelNames;
   if (aiPlayers) aiPlayerNames = aiPlayerNames.filter((name) => aiPlayers.includes(name));
 

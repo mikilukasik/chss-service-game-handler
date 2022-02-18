@@ -3,15 +3,15 @@ import { updateGame } from '../services/gameService';
 import { getMoveFromBooks } from '../services/openingsService';
 import { resolveSmallMoveTaskOnWorker } from './workersController';
 
-const CUTOFF_TIME = 2000;
+const CUTOFF_TIME = 1500;
 
 // TODO: this ABORT_TIME is not fully implemented.. hence 75s
 const ABORT_TIME = 75000;
 
-export const getNextGameState = async({ game, updateProgress }) => {
+export const getNextGameState = async ({ game, updateProgress }) => {
   if (game.nextMoves.length === 1) {
     const nextGameState = Object.assign({}, moveInBoard(game.nextMoves[0], game));
-  
+
     await updateGame(nextGameState);
     return { nextGameState, stats: null };
   }
@@ -23,7 +23,7 @@ export const getNextGameState = async({ game, updateProgress }) => {
     const moveFromBooks = await getMoveFromBooks(game);
     if (moveFromBooks) {
       const nextGameState = Object.assign({}, moveInBoard(moveFromBooks, game));
-  
+
       await updateGame(nextGameState);
       return { nextGameState, stats: null };
     }
@@ -33,7 +33,7 @@ export const getNextGameState = async({ game, updateProgress }) => {
 
   const depth1Moves = game.nextMoves;
 
-  const getResult = async() => {
+  const getResult = async () => {
     const started = Date.now();
     const endAt = started + ABORT_TIME;
 
@@ -46,63 +46,76 @@ export const getNextGameState = async({ game, updateProgress }) => {
 
     while (Date.now() - started < CUTOFF_TIME || depth < 4) {
       depth += 1;
-      console.log(`${Date.now() - started}ms: depth ${depth}`)
+      console.log(`${Date.now() - started}ms: depth ${depth}`);
 
       try {
         result = await getResultForDepth(depth, d1Moves, d2Moves, popularMoves, moveTrees, endAt);
         result.sort((a, b) => a.score - b.score);
 
-        d1Moves = result.map(r => r.move);
+        d1Moves = result.map((r) => r.move);
 
         popularMoves = result.reduce((p, c) => {
-          c.moveTree.forEach(m => p[m] = (p[m] || 0) + 1);
+          c.moveTree.forEach((m) => (p[m] = (p[m] || 0) + 1));
           return p;
         }, {});
-      } catch(e) {
+      } catch (e) {
         if (e) throw e;
       }
     }
 
-    console.log(`${Date.now() - started}ms: out`)
+    console.log(`${Date.now() - started}ms: out`);
     return result;
-  }
-  
+  };
 
-  const getResultForDepth = async(depth, d1Moves, d2Moves, popularMoves, moveTrees, endAt) => {
+  const getResultForDepth = async (depth, d1Moves, d2Moves, popularMoves, moveTrees, endAt) => {
     const currentBest = [-32768];
     const progress = {
       total: d1Moves.length,
-      completed: 0
+      completed: 0,
     };
 
-    const result = (await Promise.all(d1Moves.map(move => 
-      resolveSmallMoveTaskOnWorker({ move, nextMoves: d2Moves[move], currentBest, board: game.board, desiredDepth: depth, popularMoves, moveTree: moveTrees[move], endAt, dontLoop: game.dontLoop, repeatedPastFens: game.repeatedPastFens }).then(response => {
-        if (currentBest[0] === -32768 ||
-          (true && response.score < currentBest[0])
-        ) {
-          currentBest[0] = response.score
-        }
+    const result = (
+      await Promise.all(
+        d1Moves.map((move) =>
+          resolveSmallMoveTaskOnWorker({
+            move,
+            nextMoves: d2Moves[move],
+            currentBest,
+            board: game.board,
+            desiredDepth: depth,
+            popularMoves,
+            moveTree: moveTrees[move],
+            endAt,
+            dontLoop: game.dontLoop,
+            repeatedPastFens: game.repeatedPastFens,
+          })
+            .then((response) => {
+              if (currentBest[0] === -32768 || (true && response.score < currentBest[0])) {
+                currentBest[0] = response.score;
+              }
 
-        d2Moves[move] = response.nextMoves;
-        moveTrees[move] = response.moveTree;
-        progress.completed += 1;
-        if (depth >= 4) updateProgress(progress);
+              d2Moves[move] = response.nextMoves;
+              moveTrees[move] = response.moveTree;
+              progress.completed += 1;
+              if (depth >= 4) updateProgress(progress);
 
-        if (Date.now() > endAt) throw false;
+              if (Date.now() > endAt) throw false;
 
-        return response;
-      }).catch(e => {
-        if (!e) throw e;
-        console.error(e);
-      })
-    )))
+              return response;
+            })
+            .catch((e) => {
+              if (!e) throw e;
+              console.error(e);
+            }),
+        ),
+      )
+    )
       .filter(Boolean)
-      .map(r => (Object.assign(r, { score: r.score - game.pieceBalance })));
+      .map((r) => Object.assign(r, { score: r.score - game.pieceBalance }));
 
     if (!result.length) return null;
     return result;
   };
-
 
   const r = await getResult();
   const nextGameState = Object.assign({}, moveInBoard(r[0].move, game));

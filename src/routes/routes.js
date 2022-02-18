@@ -34,7 +34,5 @@ export const initRoutes = ({ msg }) => {
   workersController.init({ workersSocket });
 
   const tournamentSocket = msg.ws('/tournamentSocket');
-  tournamentController.init({ tournamentSocket });
-
-  msg.static('/models/', 'public/models'); //.then(console.log, console.error);
+  tournamentController.init({ tournamentSocket, msg });
 };
