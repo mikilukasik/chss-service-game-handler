@@ -103,7 +103,7 @@ const getCachedGame = async ({ wPlayer, bPlayer }) => {
 export const createTournament = async ({ aiPlayers, randomValue, rounds, connection }) => {
   await fs.mkdir(path.resolve(cacheFolder), { recursive: true });
 
-  let modelNames = await _msg.do('getAllModelNames');
+  let modelNames = await _msg.do('getAllModelNames', { requiredFiles: ['loader.js'] });
   let aiPlayerNames = modelNames;
   if (aiPlayers) aiPlayerNames = aiPlayerNames.filter((name) => aiPlayers.includes(name));
 
@@ -137,6 +137,7 @@ export const createTournament = async ({ aiPlayers, randomValue, rounds, connect
       game: cachedGame,
       connection: i % 500 === 0 ? connection : null,
     });
+
     games.splice(i, 1);
   }
 
