@@ -1,5 +1,6 @@
 import { initRoutes } from './src/routes/routes';
 import msgService from './msg/src/service';
+import { initGameController } from './src/controllers/gameControllerV2';
 
 const SERVICE_NAME = 'chss-service-game-handler';
 const PORT = 4300;
@@ -16,6 +17,7 @@ export default () => {
     .connect()
     .then(() => {
       initRoutes({ msg });
+      initGameController({ msg });
     })
     .catch(console.error);
 };
