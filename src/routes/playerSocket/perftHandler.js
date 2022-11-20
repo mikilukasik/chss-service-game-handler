@@ -1,11 +1,8 @@
-import { getNextGameState } from "../../controllers/gameController";
-import { perft } from "../../services/debugService";
-import { getGame, updateGame } from "../../services/gameService";
-import { getLoggedInUsersForClient } from "../../services/userService";
+import { perft } from '../../services/debugService';
 
 export const perftHandler = [
   'perft',
-  async(data, comms) => {
+  async (data, comms) => {
     try {
       const updateProgress = (progress) => comms.data({ progress });
       comms.send(await perft({ data, updateProgress }));

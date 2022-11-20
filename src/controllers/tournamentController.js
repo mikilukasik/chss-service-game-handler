@@ -1,11 +1,6 @@
-import { moveInBoard } from '../../chss-module-engine/src/engine/engine';
 import { getModelsHandler } from '../routes/tournamentSocket/getModelsHandler';
 import { startTournamentHandler } from '../routes/tournamentSocket/startTournamentHandler';
 import { tournamentGameFinishedHandler } from '../routes/tournamentSocket/tournamentGameFinishedHandler';
-import { updateGame } from '../services/gameService';
-import { getMoveFromBooks } from '../services/openingsService';
-// import { getModelNames } from '../services/tournamentService';
-import { resolveSmallMoveTaskOnWorker } from './workersController';
 import uuid from 'uuid-random';
 import path from 'path';
 import { promises as fs } from 'fs';
