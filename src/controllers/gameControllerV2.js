@@ -3,6 +3,7 @@ import { updateGame } from '../services/gameService';
 
 const depth = 7;
 const aiMultiplier = 2;
+const repeatedFenPenality = 0.8;
 // const deepMoveSorters = [
 //   { modelName: 'pg_large', cutoff: 0.0001 },
 //   { modelName: 'pg_small', cutoff: 0, worker: 'main' /*, cutoff: 0.042*/ },
@@ -33,7 +34,7 @@ export const initGameController = ({ msg }) => {
 export const getNextGameState = async ({ game, updateProgress }) => {
   const prediction = await (
     await getMsg()
-  ).do('predictOnGrid', { game, aiMultiplier, deepMoveSorters, depth }, ({ onData }) => {
+  ).do('predictOnGrid', { game, aiMultiplier, deepMoveSorters, depth, repeatedFenPenality }, ({ onData }) => {
     onData(updateProgress);
   });
 
