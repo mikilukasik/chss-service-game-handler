@@ -1,4 +1,5 @@
 import { GameModel } from '../../chss-module-engine/src/model/Game';
+import { getNextGameState } from '../controllers/gameControllerV2';
 import { getPlayerSocket } from '../routes/routes';
 import { getCollection } from './mongoService';
 import { getScoreBoard, processGameScore } from './scoreBoardService';
@@ -9,13 +10,15 @@ const PAUSE_AFTER_INACTIVE_FOR = 60 * 60 * 1000;
 export const createGame = async (options) => {
   const game = new GameModel(options);
 
-  // game._id = game.id;
-  // game.createdAt = new Date().toISOString();
-  // game.updatedAt = game.createdAt;
   (await getCollection('games')).insertOne(game);
   const playerSocket = await getPlayerSocket();
 
   playerSocket.emit('gameCreated', game);
+
+  if (options.computerPlaysWhite) {
+    getNextGameState({ game });
+  }
+
   return game;
 };
 

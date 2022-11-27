@@ -6,6 +6,7 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import { GameModel } from '../../chss-module-engine/src/model/Game';
 import { startLearningHandler } from '../routes/tournamentSocket/startLearningHandler';
+import { withoutDots } from '../../../chss-service-model-store/src/services/trainingService';
 
 const cacheFolder = './tournamentGameCache';
 
@@ -82,12 +83,12 @@ const getTournamentGames = async ({ tournamentData: { randomValue, rounds, aiPla
 };
 
 const cacheResult = async (game) => {
-  const fileName = path.resolve(cacheFolder, `${game.wPlayer} vs ${game.bPlayer}.json`);
+  const fileName = path.resolve(cacheFolder, withoutDots(`${game.wPlayer} vs ${game.bPlayer}.json`));
   await fs.writeFile(fileName, JSON.stringify(game, null, 2), 'utf8');
 };
 
 const getCachedGame = async ({ wPlayer, bPlayer }) => {
-  const fileName = path.resolve(cacheFolder, `${wPlayer} vs ${bPlayer}.json`);
+  const fileName = path.resolve(cacheFolder, withoutDots(`${wPlayer} vs ${bPlayer}.json`));
   try {
     return JSON.parse(await fs.readFile(fileName, 'utf8'));
   } catch (e) {
@@ -98,7 +99,7 @@ const getCachedGame = async ({ wPlayer, bPlayer }) => {
 export const createTournament = async ({ aiPlayers, randomValue, rounds, connection }) => {
   await fs.mkdir(path.resolve(cacheFolder), { recursive: true });
 
-  let modelNames = await _msg.do('getAllModelNames', { requiredFiles: ['loader.js'] });
+  let modelNames = await _msg.do('getAllModelNames', { requiredFiles: ['loader.js'], withDots: true });
   let aiPlayerNames = modelNames;
   if (aiPlayers) aiPlayerNames = aiPlayerNames.filter((name) => aiPlayers.includes(name));
 

@@ -31,7 +31,7 @@ export const initGameController = ({ msg }) => {
   while (msgAwaiters.length) msgAwaiters.pop()(_msg);
 };
 
-export const getNextGameState = async ({ game, updateProgress }) => {
+export const getNextGameState = async ({ game, updateProgress = () => {} }) => {
   const prediction = await (
     await getMsg()
   ).do('predictOnGrid', { game, aiMultiplier, deepMoveSorters, depth, repeatedFenPenality }, ({ onData }) => {
