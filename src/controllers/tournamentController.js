@@ -7,6 +7,7 @@ import { promises as fs } from 'fs';
 import { GameModel } from '../../chss-module-engine/src/model/Game';
 import { startLearningHandler } from '../routes/tournamentSocket/startLearningHandler';
 import { withoutDots } from '../../../chss-service-model-store/src/services/trainingService';
+import { getStartingFens } from '../utils/fenSets';
 
 const cacheFolder = './tournamentGameCache';
 
@@ -40,7 +41,8 @@ const getBalance = (fen) =>
     .split('')
     .reduce((p, c) => p + (pieceValues[c] || 0), 0);
 
-const getTournamentGames = async ({ tournamentData: { randomValue, rounds, aiPlayerNames, id } }) => {
+const getTournamentGames = async ({ tournamentData: { randomValue, rounds, aiPlayerNames, id, fenSetName } }) => {
+  const startingFens = getStartingFens({ fenSet: fenSetName });
   const games = await Promise.all(
     aiPlayerNames.reduce(
       (games, playerName, playerIndex) =>
@@ -53,14 +55,14 @@ const getTournamentGames = async ({ tournamentData: { randomValue, rounds, aiPla
               const player1 = playerName;
               const player2 = aiPlayerNames[opponentIndex];
 
-              return [
+              return startingFens.map((startingFen) => [
                 new GameModel({
                   wPlayer: player1,
                   wName: player1,
                   bPlayer: player2,
                   bName: player2,
                   tournamentInfo: { randomValue, rounds, id },
-                  // computerPlaysBlack: true,
+                  fen: startingFen,
                 }),
                 new GameModel({
                   wPlayer: player2,
@@ -68,27 +70,32 @@ const getTournamentGames = async ({ tournamentData: { randomValue, rounds, aiPla
                   bPlayer: player1,
                   bName: player1,
                   tournamentInfo: { randomValue, rounds, id },
-                  // computerPlaysBlack: true,
+                  fen: startingFen,
                 }),
-              ];
+              ]);
             })
-            .flat(),
+            .flat(2),
         ),
       [],
     ),
   );
 
-  // games.sort(() => Math.random() - 0.5);
   return games;
 };
 
 const cacheResult = async (game) => {
-  const fileName = path.resolve(cacheFolder, withoutDots(`${game.wPlayer} vs ${game.bPlayer}.json`));
+  const fileName = path.resolve(
+    cacheFolder,
+    withoutDots(`${game.wPlayer} vs ${game.bPlayer} ${game.allPastFens[0].replace(/\//g, '')}`) + '.json',
+  );
   await fs.writeFile(fileName, JSON.stringify(game, null, 2), 'utf8');
 };
 
-const getCachedGame = async ({ wPlayer, bPlayer }) => {
-  const fileName = path.resolve(cacheFolder, withoutDots(`${wPlayer} vs ${bPlayer}.json`));
+const getCachedGame = async ({ wPlayer, bPlayer, startingFen }) => {
+  const fileName = path.resolve(
+    cacheFolder,
+    withoutDots(`${wPlayer} vs ${bPlayer} ${startingFen.replace(/\//g, '')}`) + '.json',
+  );
   try {
     return JSON.parse(await fs.readFile(fileName, 'utf8'));
   } catch (e) {
@@ -96,7 +103,7 @@ const getCachedGame = async ({ wPlayer, bPlayer }) => {
   }
 };
 
-export const createTournament = async ({ aiPlayers, randomValue, rounds, connection }) => {
+export const createTournament = async ({ aiPlayers, randomValue, rounds, connection, fenSetName }) => {
   await fs.mkdir(path.resolve(cacheFolder), { recursive: true });
 
   let modelNames = await _msg.do('getAllModelNames', { requiredFiles: ['loader.js'], withDots: true });
@@ -109,6 +116,7 @@ export const createTournament = async ({ aiPlayers, randomValue, rounds, connect
     aiPlayerNames,
     id: uuid(),
     gameStats: {},
+    fenSetName,
     playerStats: aiPlayerNames.reduce((p, c) => {
       p[c] = { points: 0, pieceBalance: 0, movePoints: 0, games: 0, won: 0, lost: 0, drew: 0, thinkingTimes: [] };
       return p;
@@ -121,10 +129,13 @@ export const createTournament = async ({ aiPlayers, randomValue, rounds, connect
 
   let i = games.length;
   while (i--) {
-    const { wPlayer, bPlayer } = games[i];
+    const {
+      wPlayer,
+      bPlayer,
+      allPastFens: [startingFen],
+    } = games[i];
     tournamentData.gameStats[`${wPlayer} - ${bPlayer}`] = { games: [] };
-
-    const cachedGame = await getCachedGame({ wPlayer, bPlayer });
+    const cachedGame = await getCachedGame({ wPlayer, bPlayer, startingFen });
     if (!cachedGame) continue;
 
     cachedGame.tournamentInfo.id = tournamentData.id;
@@ -183,7 +194,6 @@ export const recordTournamentGame = async ({ game, connection }) => {
     wPlayer.thinkingTimes.push(average(thinkingTimes.white));
 
     if (connection) await connection.do('updateTournamentData', tournaments[game.tournamentInfo.id]);
-    console.log(`Tournament game updated.`);
   } catch (e) {
     console.error(e);
   }

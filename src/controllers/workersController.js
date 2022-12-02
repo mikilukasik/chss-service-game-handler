@@ -47,7 +47,7 @@ const getNextAvailableConnection = async () => {
       const timeoutCountDiff = (getConnMeta(b).timeoutCount || 0) - (getConnMeta(a).timeoutCount || 0);
       if (timeoutCountDiff !== 0) return timeoutCountDiff;
 
-      return a.cookies.get('CHSS_CLIENT_SPEED') - b.cookies.get('CHSS_CLIENT_SPEED');
+      return a.cookies.get('CHSS_CLIENT_SPEED_V2') - b.cookies.get('CHSS_CLIENT_SPEED_V2');
     })
     .pop();
 
