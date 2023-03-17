@@ -12,7 +12,8 @@ const repeatedFenPenality = 0.8;
 
 const deepMoveSorters = [
   // { modelName: 'pg_large', cutoff: 0.0001 },
-  { modelName: 'pg_ML', cutoff: 0.00005 },
+  // 1.6615822938283287
+  { modelName: 'save-slash-1-dot-6615822938283287', cutoff: 0.00005 },
   { modelName: 'pg_small', worker: 'main', cutoff: 0.0005 },
   { modelName: 'pg_tiny', worker: 'sub', cutoff: 0.0005 },
 ];
